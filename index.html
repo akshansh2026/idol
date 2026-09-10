@@ -87,9 +87,6 @@
   @keyframes drift3{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(-40px,50px) scale(1.15); } }
   .vignette{ position:fixed; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(ellipse at 50% 22%, transparent 28%, rgba(4,2,9,0.68) 100%); }
 
-  @media (max-width:900px){
-    .neb-blob{ filter:blur(90px); }
-  }
   @media (max-width:600px){
     #galaxy-canvas{ filter:brightness(1.08) saturate(1.14); }
     .neb-blob{ filter:blur(72px); opacity:.30; }
@@ -227,7 +224,7 @@
   .drawer-head h3{ font-size:16px; }
   .drawer-close{ background:var(--panel-2); border:1px solid var(--panel-border); border-radius:50%; width:30px; height:30px; color:var(--ink); font-size:16px; }
   .drawer-close:hover{ border-color:var(--gold); }
-  .drawer-body{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:14px 24px; }
+  .drawer-body{ flex:1; overflow-y:auto; padding:14px 24px; }
   .cart-empty{ color:var(--muted); font-size:14px; padding:40px 0; text-align:center; }
   .cart-item{ display:flex; gap:14px; padding:16px 0; border-bottom:1px solid var(--panel-border); }
   .cart-item img{ width:50px; height:50px; border-radius:10px; object-fit:cover; flex-shrink:0; }
@@ -246,7 +243,7 @@
   .modal{ position:fixed; inset:0; z-index:300; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity .3s ease; }
   .modal.open{ opacity:1; pointer-events:auto; }
   .modal .m-overlay{ position:absolute; inset:0; background:rgba(10,5,17,0.78); backdrop-filter:blur(5px); }
-  .modal-inner{ position:relative; z-index:2; background:var(--bg-2); border:1px solid var(--panel-border); border-radius:26px; max-width:460px; width:100%; max-height:88vh; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:32px 28px; transform:scale(0.95); transition:transform .3s ease; }
+  .modal-inner{ position:relative; z-index:2; background:var(--bg-2); border:1px solid var(--panel-border); border-radius:26px; max-width:460px; width:100%; max-height:88vh; overflow-y:auto; padding:32px 28px; transform:scale(0.95); transition:transform .3s ease; }
   .modal.open .modal-inner{ transform:scale(1); }
   .modal-close{ position:absolute; top:16px; right:16px; background:var(--panel-2); border:1px solid var(--panel-border); border-radius:50%; width:30px; height:30px; color:var(--ink); }
   .m-om{ text-align:center; color:var(--gold); font-size:13px; letter-spacing:0.2em; margin-bottom:8px; }
@@ -990,6 +987,9 @@ if(typeof THREE === 'undefined'){
   const mobileQuality = innerWidth <= 768;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const lowData = !!(navigator.connection && navigator.connection.saveData);
+  // Keep the 3D galaxy running continuously, but render the background at a deliberately
+  // compact internal resolution. The slow-moving scene keeps the lower render resolution
+  // visually clean while dramatically reducing GPU load on phones and laptops.
   const canvas = document.getElementById('galaxy-canvas');
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x010207);
@@ -1002,14 +1002,13 @@ if(typeof THREE === 'undefined'){
   // Performance-tuned WebGL: keep the galaxy active everywhere, but avoid expensive
   // multisampling and excessive device-pixel rendering on phones.
   const renderer = new THREE.WebGLRenderer({canvas, alpha:false, antialias:false, powerPreference:'high-performance', preserveDrawingBuffer:false});
-  let pixelRatio = mobileQuality ? Math.min(devicePixelRatio || 1, 0.62) : Math.min(devicePixelRatio || 1, 1.4);
-  const pixelRatioFloor = mobileQuality ? 0.36 : 0.55;
-  function applyPixelRatio(){ renderer.setPixelRatio(pixelRatio); }
-  applyPixelRatio();
-  renderer.setSize(innerWidth, innerHeight);
+  const pixelRatio = mobileQuality ? 0.42 : 0.58;
+  renderer.setPixelRatio(pixelRatio);
+  renderer.setSize(innerWidth, innerHeight, false);
   if('outputColorSpace' in renderer && THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
   if(THREE.ACESFilmicToneMapping) renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.18;
+  renderer.shadowMap.enabled = false;
 
   const loader = new THREE.TextureLoader();
   loader.setCrossOrigin('anonymous');
@@ -1052,26 +1051,23 @@ if(typeof THREE === 'undefined'){
     const m=new THREE.PointsMaterial({size,vertexColors:true,transparent:true,opacity,depthWrite:false,sizeAttenuation:true,blending:THREE.AdditiveBlending});
     const p=new THREE.Points(g,m); scene.add(p); return p;
   }
-  const starsFar=starLayer(mobileQuality ? 900 : 4500,55,180,mobileQuality ? .045 : .038,mobileQuality ? .74 : .78);
-  const starsMid=starLayer(mobileQuality ? 260 : 1400,25,90,mobileQuality ? .065 : .058,mobileQuality ? .70 : .72);
-  const starsNear=starLayer(mobileQuality ? 55 : 260,13,42,mobileQuality ? .105 : .095,mobileQuality ? .82 : .86);
+  const starsFar=starLayer(mobileQuality ? 420 : 1900,55,180,mobileQuality ? .055 : .045,mobileQuality ? .76 : .80);
+  const starsMid=starLayer(mobileQuality ? 120 : 700,25,90,mobileQuality ? .075 : .062,mobileQuality ? .72 : .74);
+  const starsNear=starLayer(mobileQuality ? 28 : 120,13,42,mobileQuality ? .115 : .105,mobileQuality ? .84 : .88);
 
   /* Bright star points with soft halos. */
   const starSprites=new THREE.Group();
-  for(let i=0;i<(mobileQuality ? 10 : 32);i++){
+  for(let i=0;i<(mobileQuality ? 5 : 16);i++){
     const a=Math.random()*Math.PI*2, r=28+Math.random()*125, y=(Math.random()-.5)*90;
-    const baseOp=.32+Math.random()*.42;
-    const s=new THREE.Sprite(new THREE.SpriteMaterial({map:whiteGlow,color:0xffffff,transparent:true,opacity:baseOp,depthWrite:false,blending:THREE.AdditiveBlending}));
-    s.position.set(Math.cos(a)*r,y,Math.sin(a)*r); const z=.45+Math.random()*.8; s.scale.set(z,z,z);
-    s.userData.baseOpacity=baseOp; s.userData.phase=Math.random()*Math.PI*2; s.userData.speed=.6+Math.random()*1.1;
-    starSprites.add(s);
+    const s=new THREE.Sprite(new THREE.SpriteMaterial({map:whiteGlow,color:0xffffff,transparent:true,opacity:.32+Math.random()*.42,depthWrite:false,blending:THREE.AdditiveBlending}));
+    s.position.set(Math.cos(a)*r,y,Math.sin(a)*r); const z=.45+Math.random()*.8; s.scale.set(z,z,z); starSprites.add(s);
   }
   scene.add(starSprites);
 
   /* Milky Way: layered point clouds plus soft nebula glows. */
   const mw=new THREE.Group();
   for(let layer=0;layer<2;layer++){
-    const count=mobileQuality ? 260 : 1200, pos=new Float32Array(count*3), col=new Float32Array(count*3);
+    const count=mobileQuality ? 120 : 620, pos=new Float32Array(count*3), col=new Float32Array(count*3);
     for(let i=0;i<count;i++){
       const a=Math.random()*Math.PI*2, r=32+Math.random()*125;
       const spread=(Math.random()-.5)*(1.1+r*.035)*(layer+1)*.55;
@@ -1085,7 +1081,7 @@ if(typeof THREE === 'undefined'){
   const nebula=new THREE.Group();
   [[-8,7,-42,18,.16],[15,-5,-54,22,.12],[-22,10,-65,26,.10],[27,15,-80,30,.08]].forEach((v,i)=>{
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:i%2?violetGlow:blueGlow,transparent:true,opacity:v[4],depthWrite:false,blending:THREE.AdditiveBlending}));
-    sp.position.set(v[0],v[1],v[2]); sp.scale.set(v[3],v[3],1); sp.userData.baseOpacity=v[4]; nebula.add(sp);
+    sp.position.set(v[0],v[1],v[2]); sp.scale.set(v[3],v[3],1); nebula.add(sp);
   });
   scene.add(nebula);
 
@@ -1093,7 +1089,7 @@ if(typeof THREE === 'undefined'){
   system.rotation.x=-.28; system.rotation.z=.045; system.position.set(.8,.05,-1.0); scene.add(system);
 
   /* Sun: high resolution sphere + corona layers + point light. */
-  const sun=new THREE.Mesh(new THREE.SphereGeometry(1.22,mobileQuality ? 20 : 40,mobileQuality ? 20 : 40),new THREE.MeshBasicMaterial({map:tex('sun.jpg')}));
+  const sun=new THREE.Mesh(new THREE.SphereGeometry(1.22,mobileQuality ? 12 : 18,mobileQuality ? 12 : 18),new THREE.MeshBasicMaterial({map:tex('sun.jpg')}));
   system.add(sun);
   const corona=new THREE.Group();
   [1.55,1.92,2.45,3.15].forEach((r,i)=>{
@@ -1106,7 +1102,7 @@ if(typeof THREE === 'undefined'){
   scene.add(new THREE.AmbientLight(0x11182b,.18));
 
   function orbitLine(radius){
-    const pts=[]; for(let i=0;i<=(mobileQuality ? 48 : 96);i++){const a=i/(mobileQuality ? 48 : 96)*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(a)*radius,0,Math.sin(a)*radius));}
+    const pts=[]; for(let i=0;i<=(mobileQuality ? 36 : 72);i++){const a=i/(mobileQuality ? 36 : 72)*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(a)*radius,0,Math.sin(a)*radius));}
     const g=new THREE.BufferGeometry().setFromPoints(pts);
     const line=new THREE.LineLoop(g,new THREE.LineBasicMaterial({color:0xa7afc2,transparent:true,opacity:.19,depthWrite:false}));
     return line;
@@ -1144,25 +1140,20 @@ if(typeof THREE === 'undefined'){
 
     const p={mesh,orbit:d.orbit,speed:d.speed,phase,earth:!!d.earth};
     if(d.earth && !mobileQuality){
-      const clouds=new THREE.Mesh(new THREE.SphereGeometry(d.r*1.018,mobileQuality ? 16 : 40,mobileQuality ? 12 : 24),new THREE.MeshPhongMaterial({map:tex('earth_clouds_1024.png',false),transparent:true,opacity:.55,depthWrite:false,blending:THREE.NormalBlending}));
+      const clouds=new THREE.Mesh(new THREE.SphereGeometry(d.r*1.018,mobileQuality ? 8 : 18,mobileQuality ? 6 : 10),new THREE.MeshPhongMaterial({map:tex('earth_clouds_1024.png',false),transparent:true,opacity:.55,depthWrite:false,blending:THREE.NormalBlending}));
       mesh.add(clouds); p.clouds=clouds;
-      const atmo=new THREE.Mesh(new THREE.SphereGeometry(d.r*1.10,mobileQuality ? 16 : 40,mobileQuality ? 12 : 24),new THREE.MeshBasicMaterial({color:0x4cb9ff,transparent:true,opacity:.11,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false})); mesh.add(atmo);
-      const moonPivot=new THREE.Group(); mesh.add(moonPivot); const moon=new THREE.Mesh(new THREE.SphereGeometry(.105,mobileQuality ? 14 : 32,mobileQuality ? 10 : 20),new THREE.MeshStandardMaterial({map:tex('moon_1024.jpg'),roughness:.96})); moon.position.set(.68,.04,0); moonPivot.add(moon); p.moonPivot=moonPivot; earthRef.mesh=mesh; earthRef.material=material;
+      const atmo=new THREE.Mesh(new THREE.SphereGeometry(d.r*1.10,mobileQuality ? 8 : 18,mobileQuality ? 6 : 10),new THREE.MeshBasicMaterial({color:0x4cb9ff,transparent:true,opacity:.11,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false})); mesh.add(atmo);
+      const moonPivot=new THREE.Group(); mesh.add(moonPivot); const moon=new THREE.Mesh(new THREE.SphereGeometry(.105,mobileQuality ? 8 : 16,mobileQuality ? 6 : 10),new THREE.MeshStandardMaterial({map:tex('moon_1024.jpg'),roughness:.96})); moon.position.set(.68,.04,0); moonPivot.add(moon); p.moonPivot=moonPivot; earthRef.mesh=mesh; earthRef.material=material;
     }
     if(d.ring){
-      const ring=new THREE.Mesh(new THREE.RingGeometry(d.r*1.03,d.r*2.12,mobileQuality ? 24 : 64),new THREE.MeshBasicMaterial({map:tex('saturn_ring.png',false),transparent:true,side:THREE.DoubleSide,opacity:.92,depthWrite:false}));
+      const ring=new THREE.Mesh(new THREE.RingGeometry(d.r*1.03,d.r*2.12,mobileQuality ? 18 : 32),new THREE.MeshBasicMaterial({map:tex('saturn_ring.png',false),transparent:true,side:THREE.DoubleSide,opacity:.92,depthWrite:false}));
       ring.rotation.x=Math.PI/2.18; mesh.add(ring); p.ring=ring;
-    }
-    if(!d.earth){
-      const rimColor = idx<2 ? 0xffcf95 : 0x8fc4ff;
-      const rim=new THREE.Sprite(new THREE.SpriteMaterial({map:whiteGlow,color:rimColor,transparent:true,opacity:.15,depthWrite:false,blending:THREE.AdditiveBlending}));
-      const gs=d.r*2.5; rim.scale.set(gs,gs,1); mesh.add(rim); p.rimGlow=rim;
     }
     planets.push(p);
   });
 
   /* More natural asteroid belt: points plus a few illuminated chunks. */
-  const asteroidCount=mobileQuality ? 35 : 220, ap=new Float32Array(asteroidCount*3), ac=new Float32Array(asteroidCount*3);
+  const asteroidCount=mobileQuality ? 18 : 80, ap=new Float32Array(asteroidCount*3), ac=new Float32Array(asteroidCount*3);
   for(let i=0;i<asteroidCount;i++){
     const a=Math.random()*Math.PI*2, r=5.52+Math.random()*.82, j=i*3;
     ap[j]=Math.cos(a)*r; ap[j+1]=(Math.random()-.5)*.38; ap[j+2]=Math.sin(a)*r;
@@ -1171,43 +1162,24 @@ if(typeof THREE === 'undefined'){
   const ag=new THREE.BufferGeometry(); ag.setAttribute('position',new THREE.BufferAttribute(ap,3)); ag.setAttribute('color',new THREE.BufferAttribute(ac,3));
   system.add(new THREE.Points(ag,new THREE.PointsMaterial({size:.028,vertexColors:true,transparent:true,opacity:.62,sizeAttenuation:true,depthWrite:false})));
 
-  let mouseX=0,mouseY=0,mouseTargetX=0,mouseTargetY=0,mouseTicking=false;
-  addEventListener('mousemove',e=>{
-    mouseTargetX=(e.clientX/innerWidth-.5)*2; mouseTargetY=(e.clientY/innerHeight-.5)*2;
-    if(!mouseTicking){ mouseTicking=true; requestAnimationFrame(()=>{ mouseX=mouseTargetX; mouseY=mouseTargetY; mouseTicking=false; }); }
-  },{passive:true});
-  let resizeTimer=null, lastW=innerWidth, lastH=innerHeight;
+  let mouseX=0,mouseY=0;
+  addEventListener('mousemove',e=>{mouseX=(e.clientX/innerWidth-.5)*2;mouseY=(e.clientY/innerHeight-.5)*2;});
+  let resizeTimer=0;
   addEventListener('resize',()=>{
     clearTimeout(resizeTimer);
     resizeTimer=setTimeout(()=>{
-      const w=innerWidth, h=innerHeight;
-      if(mobileQuality && Math.abs(w-lastW)<2 && Math.abs(h-lastH)<120) return; // ignore mobile URL-bar show/hide, avoids re-render jank
-      lastW=w; lastH=h;
-      camera.aspect=w/h; camera.updateProjectionMatrix();
-      renderer.setSize(w,h);
-      applyPixelRatio();
+      camera.aspect=innerWidth/innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth,innerHeight,false);
+      renderer.setPixelRatio(pixelRatio);
     },120);
-  },{passive:true});
+  });
 
   const clock=new THREE.Clock();
-  let lastFrame=0, lastRaw=performance.now();
-  let slowFrames=0, checkedFrames=0, lastQualityCheck=performance.now();
+  let lastFrame=0;
+  let frameCount=0;
   function animate(now=performance.now()){
     requestAnimationFrame(animate);
-
-    // Lightweight FPS watchdog: if a device is genuinely struggling, ease the
-    // render resolution down a notch until it's comfortable again, instead of
-    // ever dropping animation frames or stalling scrolling.
-    const rawDelta=now-lastRaw; lastRaw=now; checkedFrames++;
-    if(rawDelta>(mobileQuality?40:26)) slowFrames++;
-    if(now-lastQualityCheck>2200){
-      if(checkedFrames>10 && slowFrames/checkedFrames>0.35 && pixelRatio>pixelRatioFloor){
-        pixelRatio=Math.max(pixelRatioFloor, +(pixelRatio-0.12).toFixed(2));
-        applyPixelRatio();
-      }
-      slowFrames=0; checkedFrames=0; lastQualityCheck=now;
-    }
-
     const targetGap=mobileQuality ? 33 : 22;
     if(now-lastFrame<targetGap) return;
     lastFrame=now;
@@ -1228,16 +1200,10 @@ if(typeof THREE === 'undefined'){
     sun.rotation.y=t*.035; corona.rotation.z=t*.012; corona.scale.setScalar(1+Math.sin(t*.75)*.025);
     system.rotation.y=t*.007; system.position.y=.05+Math.sin(t*.17)*.025;
     mw.rotation.y=t*.0012; starsFar.rotation.y=t*.00015; starsMid.rotation.y=-t*.0004; starsNear.rotation.y=t*.0011; starSprites.rotation.y=t*.0007;
-    starSprites.children.forEach(s=>{
-      const tw=.72+.28*Math.sin(t*s.userData.speed+s.userData.phase);
-      s.material.opacity=s.userData.baseOpacity*tw;
-    });
-    nebula.children.forEach((n,i)=>{
-      n.material.opacity=n.userData.baseOpacity*(.82+.18*Math.sin(t*.14+i*1.7));
-    });
     camera.position.x+=(.45+mouseX*(mobileQuality?.32:.68)-camera.position.x)*(mobileQuality?.025:.014);
     camera.position.y+=(5.55-mouseY*(mobileQuality?.18:.40)-camera.position.y)*(mobileQuality?.025:.014);
-    camera.lookAt(.55,.2,-.35);
+    frameCount++;
+    if((frameCount & 3) === 0) camera.lookAt(.55,.2,-.35);
     renderer.render(scene,camera);
   }
   animate();
