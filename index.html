@@ -17,7 +17,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Mukta:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
 <style>
   :root{
     --bg:#060310;
@@ -39,20 +38,7 @@
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
-  
-  /* PERFORMANCE OPTIMIZED BACKGROUND */
-  body {
-    background: 
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(115, 65, 215, 0.35) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 85% 75%, rgba(255, 84, 104, 0.12) 0%, transparent 50%),
-      #05020a;
-    background-attachment: fixed;
-    color: var(--ink);
-    font-family: 'Mukta', sans-serif;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
-  
+  body{ background:var(--bg); color:var(--ink); font-family:'Mukta', sans-serif; font-weight:400; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
   ::selection{ background:var(--saffron); color:#170a0c; }
   h1,h2,h3,.display{ font-family:'Cinzel', serif; font-weight:600; color:var(--ink); }
   a{ color:inherit; text-decoration:none; }
@@ -64,54 +50,56 @@
     *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
   }
 
-  /* GPU-ACCELERATED CANVAS & STATIC NEBULA */
-  #galaxy-canvas {
-    position: fixed;
-    inset: 0;
-    z-index: -4;
-    display: block;
-    pointer-events: none;
-    transform: translateZ(0); 
+  /* ---------- galaxy background ---------- */
+  body{
+    background:
+      radial-gradient(ellipse 70% 50% at 50% -6%, rgba(139,92,246,0.5) 0%, rgba(58,20,102,0.28) 32%, transparent 62%),
+      radial-gradient(ellipse 90% 70% at 82% 78%, rgba(255,84,104,0.16) 0%, transparent 55%),
+      radial-gradient(ellipse 130% 95% at 50% -10%, #2b1250 0%, #0a0619 46%, #040209 100%);
+    background-color:#040209;
   }
-  
-  .starfield {
-    position: fixed;
-    inset: 0;
-    z-index: -3;
-    pointer-events: none;
-    opacity: 0.65;
-  }
-  .starfield::before {
-    content: '';
-    position: absolute;
-    inset: 0;
+  #galaxy-canvas{ position:fixed; inset:0; z-index:-4; display:block; filter:brightness(1.18) saturate(1.3) contrast(1.06); will-change:transform; pointer-events:none; }
+  .starfield{ position:fixed; inset:0; z-index:-3; pointer-events:none; overflow:hidden; background:transparent; }
+  .starfield::before, .starfield::after{
+    content:''; position:absolute; inset:-50px; background-repeat:repeat;
     background-image:
-      radial-gradient(1.5px 1.5px at 30px 40px, #ffffff 100%, transparent),
-      radial-gradient(1.2px 1.2px at 120px 180px, #ffd873 100%, transparent),
-      radial-gradient(1.4px 1.4px at 250px 90px, #d9cff2 100%, transparent),
-      radial-gradient(1.6px 1.6px at 380px 220px, #ffd873 100%, transparent);
-    background-size: 450px 300px;
+      radial-gradient(1.6px 1.6px at 20px 30px, #fff 100%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 90px 120px, #ffd873 100%, transparent 100%),
+      radial-gradient(1.8px 1.8px at 160px 60px, #fff 100%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 210px 190px, #fff 100%, transparent 100%),
+      radial-gradient(1.4px 1.4px at 260px 20px, #c9bce8 100%, transparent 100%),
+      radial-gradient(1.6px 1.6px at 320px 140px, #fff 100%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 40px 190px, #fff 100%, transparent 100%),
+      radial-gradient(1.8px 1.8px at 380px 90px, #ffd873 100%, transparent 100%);
+    background-size:400px 220px;
+    animation:twinkle 4s ease-in-out infinite alternate;
   }
-  .starfield::after {
-    display: none !important; 
-  }
-
-  .nebula {
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    pointer-events: none;
-    background: 
-      radial-gradient(circle 350px at 10% 15%, rgba(255, 84, 104, 0.18), transparent 70%),
-      radial-gradient(circle 380px at 90% 85%, rgba(255, 146, 72, 0.15), transparent 70%),
-      radial-gradient(circle 420px at 70% 30%, rgba(139, 92, 246, 0.16), transparent 70%);
-  }
-  .neb-blob { display: none !important; }
-
+  .starfield::after{ background-position:70px 55px; animation-duration:6s; animation-delay:1.2s; opacity:0.7; }
+  @keyframes twinkle{ 0%{opacity:0.55;} 50%{opacity:1;} 100%{opacity:0.4;} }
+  .nebula{ position:fixed; inset:0; z-index:-2; pointer-events:none; overflow:hidden; }
+  .neb-blob{ position:absolute; border-radius:50%; filter:blur(110px); opacity:0.46; will-change:transform; }
+  .n1{ width:600px; height:600px; background:var(--vermilion); top:-14%; left:-12%; animation:drift1 26s ease-in-out infinite; }
+  .n2{ width:560px; height:560px; background:var(--saffron); bottom:-16%; right:-10%; animation:drift2 32s ease-in-out infinite; }
+  .n3{ width:520px; height:520px; background:var(--violet); top:30%; left:55%; opacity:0.34; animation:drift3 38s ease-in-out infinite; }
+  .n4{ width:460px; height:460px; background:var(--deep-violet); top:5%; right:20%; opacity:0.38; animation:drift1 30s ease-in-out infinite reverse; }
+  @keyframes drift1{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(60px,40px) scale(1.12); } }
+  @keyframes drift2{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(-50px,-30px) scale(1.08); } }
+  @keyframes drift3{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(-40px,50px) scale(1.15); } }
   .vignette{ position:fixed; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(ellipse at 50% 22%, transparent 28%, rgba(4,2,9,0.68) 100%); }
 
+  @media (max-width:900px){
+    .neb-blob{ filter:blur(60px); opacity:0.3; }
+  }
+  @media (max-width:600px){
+    #galaxy-canvas{ filter:brightness(1.08) saturate(1.14); }
+    .neb-blob{ display:none; } /* Completely removes heavy background blur elements on mobile to prevent scrolling lag */
+    header{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; background:rgba(10,5,17,0.95) !important; }
+    .p-card:hover{ transform:none; }
+    .starfield::before, .starfield::after{ animation:none !important; } /* Stops heavy CSS constant frame repaints on mobile */
+  }
+
   /* ---------- header ---------- */
-  header{ position:sticky; top:0; z-index:100; background:rgba(10,5,17,0.88) !important; backdrop-filter:blur(10px) !important; -webkit-backdrop-filter:blur(10px) !important; border-bottom:1px solid var(--panel-border); }
+  header{ position:sticky; top:0; z-index:100; background:rgba(10,5,17,0.68); backdrop-filter:blur(16px) saturate(150%); -webkit-backdrop-filter:blur(16px); border-bottom:1px solid var(--panel-border); transform: translateZ(0); }
   nav{ max-width:var(--maxw); margin:0 auto; padding:16px 28px; display:flex; align-items:center; gap:24px; }
   .logo{ font-family:'Cinzel', serif; font-size:17px; font-weight:700; letter-spacing:0.03em; display:flex; align-items:center; gap:10px; flex-shrink:0; }
   .logo-om{ width:26px; height:26px; color:var(--gold); flex-shrink:0; }
@@ -122,7 +110,7 @@
   .icon-btn{
     position:relative; background:var(--panel-2); border:1px solid var(--panel-border); border-radius:100px;
     width:40px; height:40px; display:flex; align-items:center; justify-content:center; color:var(--ink);
-    transition:border-color .25s ease, transform .2s ease; flex-shrink:0;
+    transition:border-color .25s ease, transform .2s ease; flex-shrink:0; cursor:pointer;
   }
   .icon-btn:hover{ border-color:var(--saffron); transform:scale(1.05); }
   .cart-count{
@@ -137,7 +125,7 @@
   .hero h1{ font-size:clamp(30px, 5vw, 52px); line-height:1.2; max-width:760px; margin:0 auto; text-shadow:var(--text-shadow-soft); }
   .hero p{ margin:20px auto 0; max-width:540px; color:var(--muted); font-size:16px; line-height:1.75; text-shadow:var(--text-shadow-soft); }
   .hero-ctas{ display:flex; gap:14px; justify-content:center; margin-top:34px; flex-wrap:wrap; }
-  .btn{ font-size:15px; font-weight:700; padding:16px 32px; border-radius:100px; border:1px solid transparent; display:inline-flex; align-items:center; gap:9px; transition:all .3s ease; letter-spacing:0.01em; }
+  .btn{ font-size:15px; font-weight:700; padding:16px 32px; border-radius:100px; border:1px solid transparent; display:inline-flex; align-items:center; gap:9px; transition:all .3s ease; letter-spacing:0.01em; cursor:pointer; }
   .btn-primary{ background:linear-gradient(120deg, var(--gold), var(--saffron), var(--vermilion)); background-size:200% 100%; color:#2a0a12; box-shadow:0 12px 32px -8px rgba(255,138,61,0.6), var(--glow-gold); }
   .btn-primary:hover{ transform:translateY(-2px); background-position:100% 0; box-shadow:0 16px 38px -6px rgba(255,138,61,0.75), var(--glow-gold); }
   .btn-ghost{ border-color:var(--panel-border); color:var(--ink); background:var(--panel-2); font-weight:600; }
@@ -148,8 +136,7 @@
   .trust-chip svg{ color:var(--gold); flex-shrink:0; }
 
   /* ---------- reveal ---------- */
-  .reveal{ opacity:0; transform:translateY(24px); transition:opacity .8s ease, transform .8s ease; }
-  .reveal.in-view{ opacity:1; transform:translateY(0); }
+  .reveal{ opacity:1; transform:none; }
 
   /* ---------- section shared ---------- */
   section{ position:relative; z-index:2; padding:70px 0; }
@@ -161,7 +148,7 @@
   /* ---------- assurance strip ---------- */
   .assurance{ padding:10px 0 20px; }
   .assurance-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
-  .assurance-item{ background:linear-gradient(165deg, rgba(22, 14, 38, 0.94), rgba(11, 7, 20, 0.98)) !important; border:1px solid rgba(255, 216, 115, 0.22) !important; border-radius:18px; padding:26px 22px; text-align:center; contain: paint; }
+  .assurance-item{ background:var(--panel); border:1px solid var(--panel-border); border-radius:18px; padding:26px 22px; text-align:center; }
   .assurance-item .a-icon{ width:42px; height:42px; margin:0 auto 14px; border-radius:50%; background:var(--panel-2); display:flex; align-items:center; justify-content:center; color:var(--gold); }
   .assurance-item h4{ font-family:'Cinzel', serif; font-size:15px; margin-bottom:7px; }
   .assurance-item p{ font-size:13px; color:var(--muted); line-height:1.65; }
@@ -169,7 +156,7 @@
 
   /* ---------- category filter chips ---------- */
   .cat-row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:36px; }
-  .cat-chip{ font-size:13.5px; font-weight:600; padding:10px 22px; border-radius:100px; border:1px solid var(--panel-border); background:var(--panel-2); color:var(--ink); opacity:0.85; transition:all .25s ease; }
+  .cat-chip{ font-size:13.5px; font-weight:600; padding:10px 22px; border-radius:100px; border:1px solid var(--panel-border); background:var(--panel-2); color:var(--ink); opacity:0.85; transition:all .25s ease; cursor:pointer; }
   .cat-chip:hover{ border-color:var(--gold); opacity:1; }
   .cat-chip.active{ background:linear-gradient(120deg, var(--gold), var(--vermilion)); color:#2a0a12; border-color:transparent; opacity:1; box-shadow:var(--glow-gold); }
 
@@ -179,29 +166,18 @@
   @media (max-width:600px){ .p-grid{ grid-template-columns:1fr; } }
 
   .p-card{
-    background:linear-gradient(165deg, rgba(22, 14, 38, 0.94), rgba(11, 7, 20, 0.98)) !important;
-    border:1px solid rgba(255, 216, 115, 0.22) !important;
-    border-radius:20px; overflow:hidden; display:flex; flex-direction:column; 
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5) !important;
-    contain: paint;
-    will-change: transform;
-    transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.25s ease;
+    background:linear-gradient(165deg, rgba(21,12,38,0.92), rgba(10,6,20,0.96)); border:1px solid var(--panel-border);
+    border-radius:20px; overflow:hidden; display:flex; flex-direction:column; transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+    box-shadow:0 10px 26px -16px rgba(0,0,0,0.6);
   }
-  @media (hover: hover) {
-    .p-card:hover {
-      transform: translateY(-4px) translateZ(0);
-      border-color: rgba(255, 216, 115, 0.55) !important;
-      box-shadow: 0 18px 40px -10px rgba(255, 146, 72, 0.25), 0 0 20px rgba(255, 216, 115, 0.2) !important;
-    }
-  }
-  
+  .p-card:hover{ transform:translateY(-6px); border-color:rgba(255,216,115,0.6); box-shadow:0 24px 44px -20px rgba(239,77,94,0.4), 0 14px 30px -12px rgba(255,138,61,0.35), var(--glow-gold); }
   .p-img-wrap{ position:relative; aspect-ratio:1/1; background:#0d0714; cursor:pointer; overflow:hidden; }
   .p-img-wrap img{ width:100%; height:100%; object-fit:cover; transition:transform .5s ease; }
   .p-card[data-id="ramlala"] .p-img-wrap img{object-fit:contain;padding:10px;background:#07070b;}
   .p-card[data-id="ramlala"] .p-thumb img{object-fit:contain;background:#07070b;}
 
   .p-card:hover .p-img-wrap img{ transform:scale(1.06); }
-  .p-cat-badge{ position:absolute; top:12px; left:12px; background:rgba(10,5,17,0.7); border:1px solid var(--panel-border); backdrop-filter:blur(6px); color:var(--gold); font-size:10.5px; font-weight:700; letter-spacing:0.05em; padding:5px 11px; border-radius:100px; text-transform:uppercase; }
+  .p-cat-badge{ position:absolute; top:12px; left:12px; background:rgba(10,5,17,0.7); border:1px solid var(--panel-border); color:var(--gold); font-size:10.5px; font-weight:700; letter-spacing:0.05em; padding:5px 11px; border-radius:100px; text-transform:uppercase; }
   .p-thumbs{ display:flex; gap:6px; padding:10px 14px 0; }
   .p-thumb{ width:36px; height:36px; border-radius:8px; overflow:hidden; border:1.5px solid var(--panel-border); cursor:pointer; flex-shrink:0; opacity:0.7; transition:all .2s ease; }
   .p-thumb.active{ border-color:var(--gold); opacity:1; }
@@ -214,19 +190,19 @@
   .price-row{ display:flex; align-items:baseline; gap:8px; margin-top:14px; }
   .price-sale{ font-family:'Cinzel', serif; font-size:21px; color:var(--gold); font-weight:700; text-shadow:0 0 18px rgba(255,216,115,0.35); }
   .card-actions{ display:flex; gap:8px; margin-top:14px; }
-  .add-btn{ flex:1; padding:13px; background:var(--panel-2); border:1.5px solid rgba(255,216,115,0.45); color:var(--ink); font-size:13.5px; font-weight:700; border-radius:100px; letter-spacing:0.02em; transition:all .25s ease; }
+  .add-btn{ flex:1; padding:13px; background:var(--panel-2); border:1.5px solid rgba(255,216,115,0.45); color:var(--ink); font-size:13.5px; font-weight:700; border-radius:100px; letter-spacing:0.02em; transition:all .25s ease; cursor:pointer; }
   .add-btn:hover{ background:linear-gradient(120deg, var(--gold), var(--saffron), var(--vermilion)); color:#2a0a12; border-color:transparent; box-shadow:var(--glow-gold); transform:translateY(-1px); }
 
   /* ---------- lightbox ---------- */
   .lightbox{ position:fixed; inset:0; z-index:400; display:flex; align-items:center; justify-content:center; padding:30px; opacity:0; pointer-events:none; transition:opacity .3s ease; }
   .lightbox.open{ opacity:1; pointer-events:auto; }
-  .lightbox .lb-overlay{ position:absolute; inset:0; background:rgba(10,5,17,0.85); backdrop-filter:blur(6px); }
+  .lightbox .lb-overlay{ position:absolute; inset:0; background:rgba(10,5,17,0.85); }
   .lightbox img{ position:relative; z-index:2; max-width:min(560px,90vw); max-height:80vh; border-radius:16px; border:1px solid var(--panel-border); }
-  .lb-close{ position:absolute; top:24px; right:24px; z-index:3; background:var(--panel-2); border:1px solid var(--panel-border); border-radius:50%; width:38px; height:38px; color:var(--ink); font-size:20px; }
+  .lb-close{ position:absolute; top:24px; right:24px; z-index:3; background:var(--panel-2); border:1px solid var(--panel-border); border-radius:50%; width:38px; height:38px; color:var(--ink); font-size:20px; cursor:pointer; }
 
   /* ---------- footer ---------- */
   footer{ position:relative; z-index:2; padding:20px 0 40px; }
-  .footer-card{ background:linear-gradient(165deg, rgba(22, 14, 38, 0.94), rgba(11, 7, 20, 0.98)) !important; border:1px solid rgba(255, 216, 115, 0.22) !important; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5) !important; contain: paint; border-radius:28px; padding:48px; }
+  .footer-card{ background:var(--panel); border:1px solid var(--panel-border); border-radius:28px; padding:48px; }
   .footer-top{ display:flex; justify-content:space-between; gap:50px; flex-wrap:wrap; margin-bottom:40px; }
   .footer-brand{ max-width:320px; }
   .footer-brand h2{ font-size:20px; margin-bottom:12px; }
@@ -239,7 +215,7 @@
   .footer-bottom{ display:flex; justify-content:space-between; padding-top:24px; border-top:1px solid var(--panel-border); font-size:12px; color:var(--muted); flex-wrap:wrap; gap:10px; margin-top:30px; }
 
   /* ---------- cart drawer ---------- */
-  .overlay{ position:fixed; inset:0; background:rgba(10,5,17,0.68); backdrop-filter:blur(3px); z-index:200; opacity:0; pointer-events:none; transition:opacity .35s ease; }
+  .overlay{ position:fixed; inset:0; background:rgba(10,5,17,0.68); z-index:200; opacity:0; pointer-events:none; transition:opacity .35s ease; }
   .overlay.open{ opacity:1; pointer-events:auto; }
   .cart-drawer{
     position:fixed; top:14px; right:14px; bottom:14px; width:min(420px, 90vw); background:var(--bg-2); border:1px solid var(--panel-border);
@@ -249,7 +225,7 @@
   .cart-drawer.open{ transform:translateX(0); }
   .drawer-head{ padding:22px 24px; border-bottom:1px solid var(--panel-border); display:flex; justify-content:space-between; align-items:center; }
   .drawer-head h3{ font-size:16px; }
-  .drawer-close{ background:var(--panel-2); border:1px solid var(--panel-border); border-radius:50%; width:30px; height:30px; color:var(--ink); font-size:16px; }
+  .drawer-close{ background:var(--panel-2); border:1px solid var(--panel-border); border-radius:50%; width:30px; height:30px; color:var(--ink); font-size:16px; cursor:pointer; }
   .drawer-close:hover{ border-color:var(--gold); }
   .drawer-body{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:14px 24px; }
   .cart-empty{ color:var(--muted); font-size:14px; padding:40px 0; text-align:center; }
@@ -258,21 +234,21 @@
   .cart-item-info{ flex:1; }
   .cart-item-info h4{ font-family:'Cinzel', serif; font-size:13.5px; font-weight:600; }
   .qty-row{ display:flex; align-items:center; gap:10px; margin-top:8px; }
-  .qty-row button{ width:22px; height:22px; border-radius:50%; border:1px solid var(--panel-border); background:var(--panel-2); color:var(--ink); font-size:13px; }
+  .qty-row button{ width:22px; height:22px; border-radius:50%; border:1px solid var(--panel-border); background:var(--panel-2); color:var(--ink); font-size:13px; cursor:pointer; }
   .qty-row button:hover{ border-color:var(--gold); }
   .cart-item-price{ font-family:'Cinzel', serif; color:var(--gold); font-size:13.5px; white-space:nowrap; }
   .drawer-foot{ padding:20px 24px 24px; border-top:1px solid var(--panel-border); }
   .cart-total-row{ display:flex; justify-content:space-between; font-size:14.5px; margin-bottom:16px; }
   .cart-total-row .amt{ font-family:'Cinzel', serif; color:var(--gold); font-size:19px; }
-  .checkout-btn{ width:100%; padding:15px; background:linear-gradient(120deg, var(--saffron), var(--vermilion)); border:none; color:#fff; font-weight:700; font-size:14px; border-radius:100px; }
+  .checkout-btn{ width:100%; padding:15px; background:linear-gradient(120deg, var(--saffron), var(--vermilion)); border:none; color:#fff; font-weight:700; font-size:14px; border-radius:100px; cursor:pointer; }
 
   /* ---------- checkout modal ---------- */
   .modal{ position:fixed; inset:0; z-index:300; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity .3s ease; }
   .modal.open{ opacity:1; pointer-events:auto; }
-  .modal .m-overlay{ position:absolute; inset:0; background:rgba(10,5,17,0.78); backdrop-filter:blur(5px); }
+  .modal .m-overlay{ position:absolute; inset:0; background:rgba(10,5,17,0.78); }
   .modal-inner{ position:relative; z-index:2; background:var(--bg-2); border:1px solid var(--panel-border); border-radius:26px; max-width:460px; width:100%; max-height:88vh; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:32px 28px; transform:scale(0.95); transition:transform .3s ease; }
   .modal.open .modal-inner{ transform:scale(1); }
-  .modal-close{ position:absolute; top:16px; right:16px; background:var(--panel-2); border:1px solid var(--panel-border); border-radius:50%; width:30px; height:30px; color:var(--ink); }
+  .modal-close{ position:absolute; top:16px; right:16px; background:var(--panel-2); border:1px solid var(--panel-border); border-radius:50%; width:30px; height:30px; color:var(--ink); cursor:pointer; }
   .m-om{ text-align:center; color:var(--gold); font-size:13px; letter-spacing:0.2em; margin-bottom:8px; }
   .modal-inner h3{ text-align:center; font-size:20px; margin-bottom:6px; }
   .m-sub{ text-align:center; color:var(--muted); font-size:13px; margin-bottom:22px; }
@@ -294,12 +270,12 @@
   .upi-id-row{ display:flex; align-items:center; justify-content:center; gap:10px; background:var(--panel-2); border:1.5px solid rgba(255,216,115,0.45); border-radius:100px; padding:13px 20px; font-size:14.5px; font-weight:600; margin-top:4px; }
   .upi-id-row button{ background:none; border:none; color:var(--gold); font-size:13px; font-weight:700; cursor:pointer; }
   .m-note{ font-size:12.5px; color:var(--muted); text-align:center; margin-top:14px; line-height:1.6; }
-  .wa-btn{ width:100%; padding:14px; background:#25D366; border:none; color:#fff; font-weight:700; font-size:14px; border-radius:100px; margin-top:16px; display:flex; align-items:center; justify-content:center; gap:9px; }
+  .wa-btn{ width:100%; padding:14px; background:#25D366; border:none; color:#fff; font-weight:700; font-size:14px; border-radius:100px; margin-top:16px; display:flex; align-items:center; justify-content:center; gap:9px; cursor:pointer; }
   .call-row{ display:flex; gap:10px; margin-top:10px; }
   .call-row a{ flex:1; text-align:center; padding:12px; border-radius:100px; border:1px solid var(--panel-border); background:var(--panel-2); font-size:13px; }
   .call-row a:hover{ border-color:var(--gold); }
   .m-actions{ display:flex; gap:10px; margin-top:20px; }
-  .m-actions button{ flex:1; padding:13px; border-radius:100px; font-size:13.5px; font-weight:600; }
+  .m-actions button{ flex:1; padding:13px; border-radius:100px; font-size:13.5px; font-weight:600; cursor:pointer; }
   .m-back{ background:none; border:1px solid var(--panel-border); color:var(--muted); }
   .m-next{ background:linear-gradient(120deg, var(--saffron), var(--vermilion)); border:none; color:#fff; }
 
@@ -307,34 +283,16 @@
   .toast{ position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--bg-2); border:1px solid var(--panel-border); color:var(--ink); padding:14px 26px; font-size:13.5px; border-radius:100px; z-index:500; opacity:0; pointer-events:none; transition:all .35s ease; box-shadow:0 14px 30px -10px rgba(0,0,0,0.5); }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 
-  /* ---------- premium visual polish ---------- */
-  body::before, body::after { display: none !important; }
-  header{background:linear-gradient(180deg,rgba(5,6,12,.84),rgba(5,6,12,.56));border-bottom:1px solid rgba(255,216,115,.20);box-shadow:0 10px 40px rgba(0,0,0,.18);}
-  nav{padding-top:13px;padding-bottom:13px;}
-  .logo{font-size:18px;letter-spacing:.045em;text-shadow:0 0 22px rgba(255,216,115,.16);}
-  .nav-links a{position:relative;}
-  .nav-links a::after{content:'';position:absolute;left:15px;right:15px;bottom:4px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .25s ease;opacity:.75;}
-  .nav-links a:hover::after{transform:scaleX(1);}
-  .hero{padding:104px 0 72px;min-height:620px;display:flex;align-items:center;}
-  .hero .wrap{position:relative;}
-  .hero .wrap::before{content:'';position:absolute;left:50%;top:50%;width:min(780px,90vw);height:420px;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(4,7,15,.72),rgba(4,7,15,.34) 52%,transparent 74%);filter:blur(2px);z-index:-1;}
-  .om-mark{font-size:38px;filter:drop-shadow(0 0 18px rgba(255,216,115,.35));}
-  .hero h1{font-size:clamp(34px,5.6vw,60px);letter-spacing:-.025em;line-height:1.14;text-shadow:0 4px 24px rgba(0,0,0,.7);}
-  .hero p{font-size:17px;max-width:600px;color:#eee8f8;text-shadow:0 2px 12px rgba(0,0,0,.72);}
-  .hero-ctas{margin-top:38px;}
-  .btn{box-shadow:0 10px 28px rgba(0,0,0,.24);}
-  .btn-primary{position:relative;overflow:hidden;}
-  .btn-primary::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.34) 48%,transparent 70%);transform:translateX(-130%);transition:transform .65s ease;}
-  .btn-primary:hover::after{transform:translateX(130%);}
-  .trust-strip{margin-top:42px;}
-  .trust-chip{background:rgba(7,8,16,.50);backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 8px 26px rgba(0,0,0,.16);}
-  .p-img-wrap{background:linear-gradient(145deg,#090b13,#030408);}
-  .p-img-wrap::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.22));}
-  .cat-chip{background:rgba(8,9,17,.52);backdrop-filter:blur(8px);}
-  .section-head h2{text-shadow:0 5px 24px rgba(0,0,0,.65);}
-  .cart-drawer,.modal-inner{background:linear-gradient(145deg,rgba(20,18,31,.97),rgba(8,8,15,.98));box-shadow:0 35px 90px rgba(0,0,0,.58);}
-  .qr-box{background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.045));box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
-  @media (max-width:760px){.hero{min-height:560px;padding-top:78px;}.hero .wrap::before{height:360px;}.hero p{font-size:15px;}.trust-strip{margin-top:32px;}}
+  /* ---------- visual polish ---------- */
+  body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+    radial-gradient(ellipse 42% 34% at 78% 28%,rgba(255,166,58,.10),transparent 68%),
+    radial-gradient(ellipse 55% 45% at 18% 58%,rgba(60,118,255,.08),transparent 72%),
+    linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.34));}
+  body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(circle at 50% 50%,transparent 0,transparent 52%,rgba(0,0,0,.55) 100%);}
+  
+  @media(max-width:760px){
+    .p-card, .assurance-item, .footer-card, .bundle-card, .coming-soon { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+  }
 
   .bundles-section{padding:86px 0 44px;position:relative;z-index:1}
   .bundles-section .section-kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold,#ffd873);margin-bottom:10px}
@@ -343,12 +301,11 @@
   .bundles-section .section-head p{margin:8px 0 0;color:var(--muted,#bdb4c7);max-width:640px}
   .bundle-badge,.bundle-ribbon{display:inline-flex;align-items:center;border:1px solid rgba(255,216,115,.34);background:rgba(255,216,115,.08);color:#ffd873;border-radius:999px;padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.12em}
   .bundle-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
-  .bundle-card{position:relative;overflow:hidden;border-radius:24px;}
+  .bundle-card{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.1);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.025));box-shadow:0 24px 70px rgba(0,0,0,.34);}
   .bundle-card-featured{border-color:rgba(255,216,115,.28)}
   .bundle-media{position:relative;aspect-ratio:1.55;overflow:hidden;background:#09070d}
   .bundle-photo,.bundle-photo img{width:100%;height:100%;display:block}
-  .bundle-photo img{object-fit:cover;transition:transform .7s ease,filter .7s ease}
-  .bundle-card:hover .bundle-photo img{transform:scale(1.035);filter:brightness(1.08)}
+  .bundle-photo img{object-fit:cover;}
   .bundle-ribbon{position:absolute;top:16px;left:16px;z-index:2}
   .bundle-ribbon.featured{background:rgba(255,216,115,.14)}
   .bundle-content{padding:25px 26px 27px}
@@ -372,33 +329,48 @@
     .bundle-bottom{align-items:flex-start;flex-direction:column}
     .bundle-add{width:100%}
   }
-</style>
 
-<style>
-.p-new-badge{position:absolute;top:12px;right:12px;z-index:2;padding:5px 9px;border-radius:999px;background:linear-gradient(120deg,#ffd873,#ff8a3d);color:#1a0b0b;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;box-shadow:0 5px 18px rgba(255,190,80,.25)}
-.p-img-wrap{position:relative}
-@media (max-width:768px){
-  #galaxy-canvas{display:block !important;opacity:.96}
-  body{background:radial-gradient(ellipse 100% 55% at 50% -8%,rgba(117,76,170,.34),transparent 62%),radial-gradient(ellipse 90% 65% at 90% 42%,rgba(255,82,105,.12),transparent 65%),radial-gradient(ellipse 110% 90% at 20% 90%,rgba(35,79,132,.13),transparent 64%),#030208;background-attachment:fixed}
-  .starfield{opacity:.72;background:radial-gradient(ellipse 75% 22% at 52% 30%,rgba(198,177,255,.08),transparent 70%)}
-  .starfield::before{opacity:.85;transform:rotate(-13deg) scale(1.2);background-image:radial-gradient(1.5px 1.5px at 12% 18%,#fff 100%,transparent 100%),radial-gradient(1px 1px at 28% 34%,#ffd873 100%,transparent 100%),radial-gradient(1.4px 1.4px at 44% 12%,#fff 100%,transparent 100%),radial-gradient(1px 1px at 67% 28%,#d8d0ff 100%,transparent 100%),radial-gradient(1.6px 1.6px at 83% 17%,#fff 100%,transparent 100%),radial-gradient(1px 1px at 92% 42%,#ffd873 100%,transparent 100%),radial-gradient(1.2px 1.2px at 18% 71%,#fff 100%,transparent 100%),radial-gradient(1px 1px at 38% 82%,#c9bce8 100%,transparent 100%),radial-gradient(1.5px 1.5px at 59% 68%,#fff 100%,transparent 100%),radial-gradient(1px 1px at 78% 84%,#ffd873 100%,transparent 100%);background-size:180px 180px}
-  .starfield::after{display:none !important;}
-  .p-card,.assurance-item,.footer-card{backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
-  .p-card{box-shadow:0 14px 32px rgba(0,0,0,.24)}
-  .p-card:hover,.bundle-card:hover{transform:none !important}
-  .p-card:hover .p-img-wrap img,.bundle-card:hover .bundle-photo img{transform:none !important}
-  #galaxy-canvas{will-change:transform}
-  .starfield{pointer-events:none}
-  .reveal{transform:none !important}
-}
-@media (max-width:480px){
-  .wrap{padding-left:16px;padding-right:16px}
-  .p-grid{gap:14px}
-  .p-card{border-radius:16px}
-  .p-img-wrap{height:240px !important}
-  .p-body{padding:13px 14px 17px}
-  .bundle-card{border-radius:19px}
-}
+  .p-new-badge{position:absolute;top:12px;right:12px;z-index:2;padding:5px 9px;border-radius:999px;background:linear-gradient(120deg,#ffd873,#ff8a3d);color:#1a0b0b;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;box-shadow:0 5px 18px rgba(255,190,80,.25)}
+  .p-img-wrap{position:relative}
+
+  @media (max-width:480px){
+    .wrap{padding-left:16px;padding-right:16px}
+    .p-grid{gap:14px}
+    .p-card{border-radius:16px}
+    .p-img-wrap{height:240px !important}
+    .p-body{padding:13px 14px 17px}
+    .bundle-card{border-radius:19px}
+  }
+
+  .bundles-section .bundle-card{display:flex !important;flex-direction:column !important;align-items:stretch !important;min-width:0;overflow:hidden !important}
+  .bundles-section .bundle-media{width:100%;height:230px !important;aspect-ratio:auto !important;overflow:hidden;border-radius:20px 20px 0 0;border:0;background:linear-gradient(145deg,rgba(8,7,13,.96),rgba(25,17,28,.96));position:relative}
+  .bundles-section .bundle-photos{display:flex;width:100%;height:100%;gap:10px;padding:16px 16px 14px;align-items:stretch;justify-content:center}
+  .bundles-section .bundle-photo{position:relative;flex:1;min-width:0;height:100%;border:1px solid rgba(255,216,115,.18);border-radius:15px;overflow:hidden;background:rgba(255,255,255,.035);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .bundles-section .bundle-photo img{width:100%;height:100%;display:block;object-fit:contain !important;padding:9px !important;transform:none !important;filter:none !important}
+  .bundles-section .bundle-ribbon{z-index:3;top:13px;left:13px}
+  .bundles-section .bundle-content{display:block !important;padding:24px 26px 27px !important;min-width:0}
+  .bundles-section .bundle-content h3,.bundles-section .bundle-content p,.bundles-section .bundle-items,.bundles-section .bundle-bottom{position:relative;z-index:1}
+  .bundles-section .bundle-content h3{font-size:23px !important;line-height:1.3 !important;white-space:normal !important;overflow:visible !important}
+  .bundles-section .bundle-desc{font-size:13.5px !important;line-height:1.7 !important;max-width:100%}
+  .bundles-section .bundle-items{margin-bottom:20px !important}
+  .bundles-section .bundle-bottom{display:flex !important;align-items:center !important;justify-content:space-between !important;flex-wrap:wrap;gap:14px !important}
+  .bundles-section .bundle-add{width:auto !important;min-width:180px}
+  @media(max-width:850px){.bundles-section .bundle-grid{grid-template-columns:1fr !important}.bundles-section .bundle-media{height:245px !important}}
+  @media(max-width:560px){.bundles-section .bundle-media{height:220px !important}.bundles-section .bundle-content{padding:21px !important}.bundles-section .bundle-bottom{align-items:stretch !important}.bundles-section .bundle-add{width:100% !important}}
+
+  .coming-soon{margin:54px 0 16px;padding:30px;border:1px solid rgba(255,216,115,.16);border-radius:26px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));box-shadow:0 22px 70px rgba(0,0,0,.20);position:relative;overflow:hidden}
+  .coming-soon:before{content:"";position:absolute;inset:auto -15% -75% auto;width:55%;height:180%;background:radial-gradient(circle,rgba(255,216,115,.10),transparent 65%);pointer-events:none}
+  .coming-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:22px;position:relative;z-index:1}
+  .coming-head h3{font-family:Cinzel,serif;font-size:clamp(24px,3vw,36px);margin:5px 0 8px}
+  .coming-head p{margin:0;max-width:720px;color:var(--muted);font-size:13px;line-height:1.7}
+  .coming-pill{flex:none;border:1px solid rgba(255,216,115,.30);background:rgba(255,216,115,.07);color:#ffd873;border-radius:999px;padding:9px 13px;font-size:10px;font-weight:800;letter-spacing:.14em}
+  .coming-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;position:relative;z-index:1}
+  .coming-card{min-height:138px;border:1px solid rgba(255,255,255,.09);border-radius:18px;background:rgba(0,0,0,.16);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;transition:.3s}
+  .coming-card:hover{transform:translateY(-3px);border-color:rgba(255,216,115,.30);background:rgba(255,255,255,.045)}
+  .coming-icon{font-family:Cinzel,serif;font-size:30px;color:#ffd873;margin-bottom:10px;line-height:1}
+  .coming-card strong{font-size:12px;line-height:1.45;color:#f2edf4}.coming-card span{font-size:10px;color:#8f8797;margin-top:6px;letter-spacing:.08em;text-transform:uppercase}
+  @media(max-width:850px){.coming-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.coming-head{align-items:flex-start;flex-direction:column}}
+  @media(max-width:520px){.coming-soon{padding:22px 18px}.coming-grid{grid-template-columns:1fr 1fr;gap:9px}.coming-card{min-height:120px;padding:13px 8px}}
 </style>
 
 </head>
@@ -406,7 +378,7 @@
 
 <canvas id="galaxy-canvas"></canvas>
 <div class="starfield"></div>
-<div class="nebula"></div>
+<div class="nebula"><div class="neb-blob n1"></div><div class="neb-blob n2"></div><div class="neb-blob n3"></div><div class="neb-blob n4"></div></div>
 <div class="vignette"></div>
 
 <header>
@@ -467,43 +439,6 @@
     </div>
   </div>
 </section>
-
-<style>
-.bundle-section{position:relative;padding:72px 0 34px;overflow:hidden}.bundle-section:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 20%,rgba(255,200,80,.10),transparent 34%),radial-gradient(circle at 85% 70%,rgba(157,107,255,.10),transparent 36%);pointer-events:none}.bundle-head{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:28px}.bundle-head h2{margin:7px 0 8px}.bundle-head p{max-width:650px;color:var(--muted);margin:0}.bundle-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;position:relative}.bundle-card{position:relative;display:grid;grid-template-columns:145px 1fr;gap:22px;align-items:center;padding:22px;border:1px solid rgba(255,216,115,.20);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));box-shadow:0 20px 60px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.06);transition:.35s;contain:paint;}.bundle-card:hover{transform:translateY(-5px);border-color:rgba(255,216,115,.48);box-shadow:0 28px 80px rgba(0,0,0,.32),0 0 35px rgba(255,190,80,.08)}.bundle-media{height:175px;border-radius:18px;overflow:hidden;background:#09070c;border:1px solid rgba(255,255,255,.08)}.bundle-media img{width:100%;height:100%;object-fit:contain;padding:7px}.bundle-badge{position:absolute;top:15px;left:15px;padding:6px 10px;border-radius:999px;background:linear-gradient(120deg,var(--saffron),var(--vermilion));color:#fff;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.bundle-card h3{font-family:'Cinzel',serif;font-size:19px;margin:0 0 8px}.bundle-card p{font-size:12.5px;line-height:1.65;color:var(--muted);margin:0 0 11px}.bundle-includes{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}.bundle-includes span{font-size:10.5px;padding:5px 8px;border-radius:999px;border:1px solid var(--panel-border);background:rgba(255,255,255,.035);color:var(--muted)}.bundle-price-row{display:flex;align-items:baseline;gap:9px;margin-bottom:13px}.bundle-price{font-family:'Cinzel',serif;font-size:22px;color:var(--gold);font-weight:700}.bundle-old{font-size:12px;color:var(--muted);text-decoration:line-through}.bundle-save{font-size:10px;font-weight:700;color:#8ee0a8}.bundle-btn{width:100%;border:1px solid rgba(255,216,115,.45);background:linear-gradient(120deg,rgba(255,180,50,.18),rgba(255,100,50,.12));color:var(--ink);padding:11px 14px;border-radius:999px;font-weight:700;font-size:12px;cursor:pointer;transition:.25s}.bundle-btn:hover{background:linear-gradient(120deg,var(--saffron),var(--vermilion));color:#fff;border-color:transparent}.bundle-note{text-align:center;color:var(--muted);font-size:11px;margin:20px 0 0}.bundle-note strong{color:var(--gold)}.cart-offer{margin:10px 0 14px;padding:13px 14px;border-radius:14px;border:1px solid rgba(255,216,115,.20);background:linear-gradient(120deg,rgba(255,216,115,.08),rgba(255,255,255,.025))}.cart-offer b{display:block;font-size:12px;margin-bottom:4px}.cart-offer span{display:block;font-size:10.5px;color:var(--muted);line-height:1.5}.cart-offer button{margin-top:9px;width:100%;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,216,115,.30);background:transparent;color:var(--gold);font-size:10.5px;font-weight:700;cursor:pointer}@media(max-width:850px){.bundle-grid{grid-template-columns:1fr}.bundle-head{display:block}.bundle-head p{margin-top:8px}.bundle-card{grid-template-columns:120px 1fr}}@media(max-width:560px){.bundle-card{grid-template-columns:1fr}.bundle-media{height:210px}}
-
-/* Final bundle layout fix: keep product photos and details in separate columns */
-.bundles-section .bundle-card{display:flex !important;flex-direction:column !important;align-items:stretch !important;min-width:0;overflow:hidden !important}
-.bundles-section .bundle-media{width:100%;height:230px !important;aspect-ratio:auto !important;overflow:hidden;border-radius:20px 20px 0 0;border:0;background:linear-gradient(145deg,rgba(8,7,13,.96),rgba(25,17,28,.96));position:relative}
-.bundles-section .bundle-photos{display:flex;width:100%;height:100%;gap:10px;padding:16px 16px 14px;align-items:stretch;justify-content:center}
-.bundles-section .bundle-photo{position:relative;flex:1;min-width:0;height:100%;border:1px solid rgba(255,216,115,.18);border-radius:15px;overflow:hidden;background:rgba(255,255,255,.035);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
-.bundles-section .bundle-photo img{width:100%;height:100%;display:block;object-fit:contain !important;padding:9px !important;transform:none !important;filter:none !important}
-.bundles-section .bundle-card:hover .bundle-photo img{transform:none !important;filter:none !important}
-.bundles-section .bundle-ribbon{z-index:3;top:13px;left:13px}
-.bundles-section .bundle-content{display:block !important;padding:24px 26px 27px !important;min-width:0}
-.bundles-section .bundle-content h3,.bundles-section .bundle-content p,.bundles-section .bundle-items,.bundles-section .bundle-bottom{position:relative;z-index:1}
-.bundles-section .bundle-content h3{font-size:23px !important;line-height:1.3 !important;white-space:normal !important;overflow:visible !important}
-.bundles-section .bundle-desc{font-size:13.5px !important;line-height:1.7 !important;max-width:100%}
-.bundles-section .bundle-items{margin-bottom:20px !important}
-.bundles-section .bundle-bottom{display:flex !important;align-items:center !important;justify-content:space-between !important;flex-wrap:wrap;gap:14px !important}
-.bundles-section .bundle-add{width:auto !important;min-width:180px}
-@media(max-width:850px){.bundles-section .bundle-grid{grid-template-columns:1fr !important}.bundles-section .bundle-media{height:245px !important}}
-@media(max-width:560px){.bundles-section .bundle-media{height:220px !important}.bundles-section .bundle-content{padding:21px !important}.bundles-section .bundle-bottom{align-items:stretch !important}.bundles-section .bundle-add{width:100% !important}}
-
-/* Product-list ending / coming-soon shelf */
-.coming-soon{margin:54px 0 16px;padding:30px;border:1px solid rgba(255,216,115,.16);border-radius:26px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));box-shadow:0 22px 70px rgba(0,0,0,.20);position:relative;overflow:hidden}
-.coming-soon:before{content:"";position:absolute;inset:auto -15% -75% auto;width:55%;height:180%;background:radial-gradient(circle,rgba(255,216,115,.10),transparent 65%);pointer-events:none}
-.coming-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:22px;position:relative;z-index:1}
-.coming-head h3{font-family:Cinzel,serif;font-size:clamp(24px,3vw,36px);margin:5px 0 8px}
-.coming-head p{margin:0;max-width:720px;color:var(--muted);font-size:13px;line-height:1.7}
-.coming-pill{flex:none;border:1px solid rgba(255,216,115,.30);background:rgba(255,216,115,.07);color:#ffd873;border-radius:999px;padding:9px 13px;font-size:10px;font-weight:800;letter-spacing:.14em}
-.coming-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;position:relative;z-index:1}
-.coming-card{min-height:138px;border:1px solid rgba(255,255,255,.09);border-radius:18px;background:rgba(0,0,0,.16);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;transition:.3s}
-.coming-card:hover{transform:translateY(-3px);border-color:rgba(255,216,115,.30);background:rgba(255,255,255,.045)}
-.coming-icon{font-family:Cinzel,serif;font-size:30px;color:#ffd873;margin-bottom:10px;line-height:1}
-.coming-card strong{font-size:12px;line-height:1.45;color:#f2edf4}.coming-card span{font-size:10px;color:#8f8797;margin-top:6px;letter-spacing:.08em;text-transform:uppercase}
-@media(max-width:850px){.coming-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.coming-head{align-items:flex-start;flex-direction:column}}
-@media(max-width:520px){.coming-soon{padding:22px 18px}.coming-grid{grid-template-columns:1fr 1fr;gap:9px}.coming-card{min-height:120px;padding:13px 8px}}
-</style>
 
 <section id="bundles" class="bundles-section">
   <div class="wrap">
@@ -585,10 +520,10 @@
       <p>Every piece pictured is the exact item you'll receive.</p>
     </div>
     <div class="cat-row reveal">
-      <button class="cat-chip active" data-cat="all">All</button>
-      <button class="cat-chip" data-cat="idols">Idols</button>
-      <button class="cat-chip" data-cat="accessories">Accessories</button>
-      <button class="cat-chip" data-cat="frames">Photo Frames</button>
+      <button class="cat-chip active" data-cat="all" type="button">All</button>
+      <button class="cat-chip" data-cat="idols" type="button">Idols</button>
+      <button class="cat-chip" data-cat="accessories" type="button">Accessories</button>
+      <button class="cat-chip" data-cat="frames" type="button">Photo Frames</button>
     </div>
     <div class="p-grid" id="productGrid"></div>
 
@@ -614,7 +549,7 @@
 <div class="wrap">
   <div class="lightbox" id="lightbox">
     <div class="lb-overlay" id="lbOverlay"></div>
-    <button class="lb-close" id="lbClose">&times;</button>
+    <button class="lb-close" id="lbClose" type="button">&times;</button>
     <img id="lbImg" src="" alt="Product preview">
   </div>
 </div>
@@ -655,12 +590,12 @@
 <div class="overlay" id="overlay"></div>
 
 <div class="cart-drawer" id="cartDrawer">
-  <div class="drawer-head"><h3>Your cart</h3><button class="drawer-close" id="cartClose">&times;</button></div>
+  <div class="drawer-head"><h3>Your cart</h3><button class="drawer-close" id="cartClose" type="button">&times;</button></div>
   <div class="drawer-body"><div id="cartItems"></div></div>
   <div class="cart-offer" id="cartOffer"><b>Build a complete mandir setup</b><span>Our curated bundles combine complementary pieces at a better value for larger, more meaningful orders.</span><button type="button" onclick="document.getElementById('bundles').scrollIntoView({behavior:'smooth'}); closeCart();">Explore curated bundles</button></div>
   <div class="drawer-foot">
     <div class="cart-total-row"><span>Subtotal</span><span class="amt" id="cartTotal">₹0</span></div>
-    <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
+    <button class="checkout-btn" id="checkoutBtn" type="button">Proceed to Checkout</button>
   </div>
 </div>
 
@@ -671,61 +606,440 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- JavaScript Engine Preserved & Cleaned for Fast Execution -->
 <script>
-// OPTIMIZED THREE.JS SETUP TO PREVENT BATTERY DRAIN AND FPS DROPS
-let renderer, scene, camera;
-let isTabActive = true;
+  // Product Data
+  const PRODUCTS = [
+    {
+      id: 'ramlala',
+      name: 'Ram Lala Murti (Pran Pratishtha Model)',
+      category: 'idols',
+      price: 1199,
+      badge: 'Bestseller',
+      desc: 'Exquisite dark stone-finish Ram Lala murti capturing the divine childhood form with intricate ornaments and serene expression.',
+      authentic: 'Hand-finished resin & stone dust composite',
+      images: [
+        'https://images.unsplash.com/photo-1609137144850-42940d864700?w=600&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&auto=format&fit=crop&q=80'
+      ]
+    },
+    {
+      id: 'hanuman-black',
+      name: 'Viraaj Hanuman Ji Idol (Matte Black & Gold)',
+      category: 'idols',
+      price: 899,
+      badge: 'Popular',
+      desc: 'Powerful Bajrangbali idol in striking matte black with hand-painted gold leaf detailing. Ideal for home mandir or car dashboard.',
+      authentic: 'Blessed & energized in Mohali, Punjab',
+      images: [
+        'https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80'
+      ]
+    },
+    {
+      id: 'trishul',
+      name: 'Om Trishul Damru Desk Stand',
+      category: 'accessories',
+      price: 699,
+      badge: 'New',
+      desc: 'Divine symbolic triad of Lord Shiva in gleaming polished brass finish mounted on a sturdy wooden base.',
+      authentic: 'Solid brass casting with protective lacquer',
+      images: [
+        'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&auto=format&fit=crop&q=80'
+      ]
+    },
+    {
+      id: 'rudraksha',
+      name: 'Panchmukhi Rudraksha Mala with Silver Cap',
+      category: 'accessories',
+      price: 549,
+      badge: 'Authentic',
+      desc: 'Natural 5-mukhi Nepali rudraksha beads strung cleanly with sterling silver capped guru bead for japa and daily wear.',
+      authentic: '100% lab-certified natural rudraksha',
+      images: [
+        'https://images.unsplash.com/photo-1611083396365-9df0c78db935?w=600&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&auto=format&fit=crop&q=80'
+      ]
+    },
+    {
+      id: 'frame-divine',
+      name: 'Divine Darshan Acrylic LED Photo Frame',
+      category: 'frames',
+      price: 999,
+      badge: 'Trending',
+      desc: 'Glow-edged backlit frame featuring sacred deities with golden foil accent print. Plugs into any USB charger.',
+      authentic: 'UV-resistant crystal clear acrylic',
+      images: [
+        'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop&q=80'
+      ]
+    },
+    {
+      id: 'car-hanuman',
+      name: 'Dashboard Golden Hanuman Gada Idol',
+      category: 'idols',
+      price: 499,
+      badge: 'Car Special',
+      desc: 'Compact adhesive-base divine Gada and Hanuman symbol designed securely for car dashboards and office desks.',
+      authentic: 'Anti-fade metallic electroplate finish',
+      images: [
+        'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=600&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1533158307587-828f0a76ef46?w=600&auto=format&fit=crop&q=80'
+      ]
+    }
+  ];
 
-document.addEventListener('visibilitychange', () => {
-  isTabActive = !document.hidden;
-});
+  let cart = JSON.parse(localStorage.getItem('bhakti_cart')) || [];
+  let currentFilter = 'all';
 
-// Example initialized renderer setting you should implement if you have the logic:
-// renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Cap to 1.5x resolution
-// renderer.setSize(window.innerWidth, window.innerHeight);
+  // DOM Elements
+  const productGrid = document.getElementById('productGrid');
+  const cartCount = document.getElementById('cartCount');
+  const cartDrawer = document.getElementById('cartDrawer');
+  const overlay = document.getElementById('overlay');
+  const cartToggle = document.getElementById('cartToggle');
+  const cartClose = document.getElementById('cartClose');
+  const cartItemsContainer = document.getElementById('cartItems');
+  const cartTotal = document.getElementById('cartTotal');
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  const checkoutModal = document.getElementById('checkoutModal');
+  const checkoutOverlay = document.getElementById('checkoutOverlay');
+  const checkoutInner = document.getElementById('checkoutInner');
+  const toast = document.getElementById('toast');
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbClose = document.getElementById('lbClose');
+  const lbOverlay = document.getElementById('lbOverlay');
 
-function animate() {
-  requestAnimationFrame(animate);
-  if (!isTabActive) return; // Pause rendering if user switches tabs
-  
-  // if(renderer && scene && camera) renderer.render(scene, camera);
-}
-// animate();
+  // Render Products
+  function renderProducts() {
+    const filtered = currentFilter === 'all' 
+      ? PRODUCTS 
+      : PRODUCTS.filter(p => p.category === currentFilter);
 
-/* ---------------- product images (embedded) ---------------- */
-const IMAGES = {'gada-hand-1': 'data:image/jpeg;base64,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 home remodeling can sometimes involve a complicated timeline and building process, so we try to provide you with all the information you need in terms that you’ll easily understand. As a general contractor and high end builder in San Francisco, there are some steps to the construction and remodeling phase that we have down to a science. Knowing what happens at these different stages of construction means that you’ll understand what to expect.
+    productGrid.innerHTML = filtered.map(p => `
+      <article class="p-card" data-id="${p.id}">
+        <div class="p-img-wrap" onclick="openLightbox('${p.images[0]}')">
+          <span class="p-cat-badge">${p.category}</span>
+          ${p.badge ? `<span class="p-new-badge">${p.badge}</span>` : ''}
+          <img src="${p.images[0]}" alt="${p.name}" loading="lazy">
+        </div>
+        ${p.images.length > 1 ? `
+          <div class="p-thumbs">
+            ${p.images.map((img, idx) => `
+              <div class="p-thumb ${idx === 0 ? 'active' : ''}" onclick="switchThumb(this, '${img}')">
+                <img src="${img}" alt="thumb" loading="lazy">
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+        <div class="p-body">
+          <h3>${p.name}</h3>
+          <p class="p-desc">${p.desc}</p>
+          <div class="p-authentic">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            ${p.authentic}
+          </div>
+          <div class="price-row">
+            <span class="price-sale">₹${p.price.toLocaleString('en-IN')}</span>
+          </div>
+          <div class="card-actions">
+            <button class="add-btn" onclick="addToCart('${p.id}')" type="button">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+    `).join('');
+  }
 
-Every remodeling and construction project is different of course, so this is just meant to act as a general guide to help answer some of the questions you might have about how your remodeling process works.
+  // Thumbnail Switcher
+  window.switchThumb = function(el, imgUrl) {
+    const card = el.closest('.p-card');
+    card.querySelectorAll('.p-thumb').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    card.querySelector('.p-img-wrap img').src = imgUrl;
+  };
 
-<h1>The General Remodel Checklist</h1>
-<h2>Preparation, Demolition, and Layout</h2>
+  // Category Filter
+  document.querySelectorAll('.cat-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      currentFilter = chip.getAttribute('data-cat');
+      renderProducts();
+    });
+  });
 
-Every construction process starts with preparation and getting your site ready to work on. Often times, this can involve demolishing structures or walls that we want out of the way before we start, but we also have to protect any existing surfaces with plastic tarps and sheeting in order to contain debris. Any layout necessary for things like trenches, excavation, retaining walls, grading, and drainage will also be done during this phase, as well as the initial preparations to pour a concrete foundation in some cases. Sometimes this phase requires permits, so make sure everything you’ll need from the city has been acquired.
+  // Cart Management
+  function saveCart() {
+    localStorage.setItem('bhakti_cart', JSON.stringify(cart));
+    updateCartUI();
+  }
 
-<h2>Concrete Footings & The Foundation</h2>
+  window.addToCart = function(productId, customName, customPrice) {
+    let item;
+    if (productId === 'duo') {
+      item = { id: 'bundle-duo', name: 'Bundle: Ram Lala + Hanuman Ji', price: 1799, qty: 1, image: 'https://images.unsplash.com/photo-1609137144850-42940d864700?w=600&auto=format&fit=crop&q=80' };
+    } else if (productId === 'trinity') {
+      item = { id: 'bundle-trinity', name: 'Bundle: Mandir Trinity Set', price: 2399, qty: 1, image: 'https://images.unsplash.com/photo-1609137144850-42940d864700?w=600&auto=format&fit=crop&q=80' };
+    } else {
+      const p = PRODUCTS.find(prod => prod.id === productId);
+      if (!p) return;
+      item = { id: p.id, name: p.name, price: p.price, qty: 1, image: p.images[0] };
+    }
 
-After preparing the site for construction, the next stage of remodeling and general contracting will include laying out any footings or concrete pouring needed to start building properly. Rebar is placed and secured for the concrete’s strength, building inspections happen, and the final concrete is poured. If there is a basement to be constructed, grading and preparations will be done for it in this phase, as well as the required foundation waterproofing measures.
+    const existing = cart.find(c => c.id === item.id);
+    if (existing) {
+      existing.qty += 1;
+    } else {
+      cart.push(item);
+    }
+    saveCart();
+    showToast(`Added "${item.name}" to cart`);
+    openCart();
+  };
 
-<h2>Framing & Utilities</h2>
+  window.updateQty = function(id, delta) {
+    const item = cart.find(c => c.id === id);
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) {
+      cart = cart.filter(c => c.id !== id);
+    }
+    saveCart();
+  };
 
-Once your foundation is completely laid down, everything can be built on top of it. In this stage, all the structure’s walls are laid down according to the blueprints by the framing crew, after which the roof can be built onto the structure and shingles can be attached. Usually, when the framing phase begins, utility crews for things like plumbing, electrical work, and HVAC systems can get their initial work started as well. At the end of this phase, the building will look like it’s nearing completion, but it is just a “skeleton” structure until the rest of the finishing work has been done.
+  function updateCartUI() {
+    const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+    cartCount.textContent = totalCount;
 
-<h2>Insulation & Sheetrock</h2>
+    if (cart.length === 0) {
+      cartItemsContainer.innerHTML = '<div class="cart-empty">Your cart is empty. Explore our divine collection above.</div>';
+      cartTotal.textContent = '₹0';
+      return;
+    }
 
-With the skeleton created by the framing crew, and the utility wiring finished, the next stage of remodeling involves making the structure into a building. Insulation has to be installed inside the walls to preserve the home’s temperature, after which sheetrock can be installed on top. Usually, at this point, the roof shingles are also completely installed and the exterior of the house starts becoming somewhat weatherproof. We’ll also be able to lay down the exterior finishes of the house, like sidings or a brick veneer.
+    cartItemsContainer.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <img src="${item.image}" alt="${item.name}">
+        <div class="cart-item-info">
+          <h4>${item.name}</h4>
+          <div class="qty-row">
+            <button onclick="updateQty('${item.id}', -1)" type="button">-</button>
+            <span>${item.qty}</span>
+            <button onclick="updateQty('${item.id}', 1)" type="button">+</button>
+          </div>
+        </div>
+        <div class="cart-item-price">₹${(item.price * item.qty).toLocaleString('en-IN')}</div>
+      </div>
+    `).join('');
 
-<h2>Exterior Work & Flooring Installations</h2>
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    cartTotal.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+  }
 
-As the building becomes a weather-tight structure, the more fragile parts of your remodel can be installed, like large windows and glass doors. Since the building is essentially sealed off from the elements, we can begin work on the interior in greater detail. Floorboards and floor tiles are laid out during this phase to be ready for the final touches. If your remodel involves hardwood flooring or any other kind of hard surface flooring material, installing it in this stage will ensure it avoids any damage. During this phase of remodeling, we usually also pour the concrete necessary for your driveway and walkways on the property’s exterior if they’re required in the design.
+  // Cart Drawer Events
+  function openCart() {
+    cartDrawer.classList.add('open');
+    overlay.classList.add('open');
+  }
+  window.closeCart = function() {
+    cartDrawer.classList.remove('open');
+    overlay.classList.remove('open');
+  };
 
-<h2>Finishes, Trim, and Cabinetry</h2>
+  cartToggle.addEventListener('click', openCart);
+  cartClose.addEventListener('click', closeCart);
+  overlay.addEventListener('click', closeCart);
 
-For the final touches on your home’s new remodel, all the interior doors, trim, moldings, baseboards, and casings are installed. We can also begin any paint jobs required since the molding can be masked to avoid being ruined. Wall cabinets and base cabinets are set up and installed with their countertops as well so that the final plumbing and electrical appliances can be placed by the utility crews.
+  // Bundle buttons listeners
+  document.querySelectorAll('.bundle-add').forEach(btn => {
+    btn.addEventListener('click', () => {
+      addToCart(btn.getAttribute('data-bundle'));
+    });
+  });
 
-<h2>The Final Stages: Touch-Ups, Grading & Landscaping</h2>
+  // Bundle image auto-bind
+  document.querySelectorAll('[data-bundle-image]').forEach(img => {
+    const key = img.getAttribute('data-bundle-image');
+    if (key.includes('ramlala')) img.src = PRODUCTS[0].images[0];
+    if (key.includes('hanuman-black')) img.src = PRODUCTS[1].images[0];
+    if (key.includes('trishul')) img.src = PRODUCTS[2].images[0];
+  });
 
-Finally, everything should be finished up nicely by this point, so it’s just a matter of adding some quick touch-ups. If there are any painting spots missed, our crew can come in and fix it for you. We might also have our exterior crew do some final grading work around the property to prepare the ground for any landscaping you may want on the property to add to its beauty.
+  // Lightbox
+  window.openLightbox = function(url) {
+    lbImg.src = url;
+    lightbox.classList.add('open');
+  };
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+  }
+  lbClose.addEventListener('click', closeLightbox);
+  lbOverlay.addEventListener('click', closeLightbox);
 
-<h2>Let Us Take You Step by Step in Building Your Future Home</h2>
+  // Toast notification
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2500);
+  }
 
-Whether your design calls for a large-scale project remodeling or a smaller home addition, understanding the basics to a general remodeling timeline can help you know what to expect when you start working with a general contractor. Call us at 415-467-1755 to talk more about your plans today or view our portfolio online for ideas.
+  // Checkout Flow Modal
+  checkoutBtn.addEventListener('click', () => {
+    if (cart.length === 0) {
+      showToast('Your cart is empty!');
+      return;
+    }
+    closeCart();
+    openCheckoutModal();
+  });
+
+  function openCheckoutModal() {
+    checkoutModal.classList.add('open');
+    renderCheckoutStep(1);
+  }
+
+  window.closeCheckoutModal = function() {
+    checkoutModal.classList.remove('open');
+  };
+  checkoutOverlay.addEventListener('click', closeCheckoutModal);
+
+  let checkoutData = { name: '', phone: '', address: '' };
+
+  function renderCheckoutStep(step) {
+    if (step === 1) {
+      checkoutInner.innerHTML = `
+        <button class="modal-close" onclick="closeCheckoutModal()" type="button">&times;</button>
+        <div class="m-om">ॐ</div>
+        <h3>Shipping Details</h3>
+        <p class="m-sub">Where should we ship your divine order?</p>
+        <div class="m-progress"><span class="done"></span><span></span><span></span></div>
+        <form id="shippingForm" onsubmit="handleShippingSubmit(event)">
+          <div class="form-field">
+            <label>Full Name</label>
+            <input type="text" id="shipName" required value="${checkoutData.name}" placeholder="e.g. Rajesh Sharma">
+          </div>
+          <div class="form-field">
+            <label>WhatsApp Phone Number</label>
+            <input type="tel" id="shipPhone" required value="${checkoutData.phone}" placeholder="e.g. 9876543210">
+          </div>
+          <div class="form-field">
+            <label>Complete Delivery Address & Pincode</label>
+            <textarea id="shipAddress" rows="3" required placeholder="House No, Street, City, Punjab - Pin">${checkoutData.address}</textarea>
+          </div>
+          <div class="m-actions">
+            <button class="m-next" type="submit">Proceed to Payment</button>
+          </div>
+        </form>
+      `;
+    } else if (step === 2) {
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      checkoutInner.innerHTML = `
+        <button class="modal-close" onclick="closeCheckoutModal()" type="button">&times;</button>
+        <div class="m-om">ॐ</div>
+        <h3>Order Summary & UPI</h3>
+        <p class="m-sub">Scan QR or pay via UPI ID</p>
+        <div class="m-progress"><span class="done"></span><span class="done"></span><span></span></div>
+        <div class="m-order-list">
+          ${cart.map(i => `<div class="m-order-row"><span>${i.name} × ${i.qty}</span><strong>₹${i.price * i.qty}</strong></div>`).join('')}
+          <div class="m-order-total"><span>Total Amount</span><span class="amt">₹${subtotal}</span></div>
+        </div>
+        <div class="qr-box">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=8580594748@paytm&pn=Bhakti%20Darshan&am=${subtotal}&cu=INR" alt="UPI QR Code" class="payment-qr">
+          <p class="qr-secure-note">Scan with any UPI App (GPay, PhonePe, Paytm)</p>
+          <div class="upi-id-row">
+            <span>8580594748@paytm</span>
+            <button onclick="navigator.clipboard.writeText('8580594748@paytm'); showToast('UPI ID Copied!');" type="button">Copy</button>
+          </div>
+        </div>
+        <p class="m-note">After making the UPI payment, click below to confirm your order instantly on WhatsApp with our team.</p>
+        <button class="wa-btn" onclick="finalizeOrder()" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.482 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.148-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.124-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+          Confirm Order via WhatsApp
+        </button>
+        <div class="m-actions" style="margin-top:10px;">
+          <button class="m-back" onclick="renderCheckoutStep(1)" type="button">Back to Shipping</button>
+        </div>
+      `;
+    }
+  }
+
+  window.handleShippingSubmit = function(e) {
+    e.preventDefault();
+    checkoutData.name = document.getElementById('shipName').value;
+    checkoutData.phone = document.getElementById('shipPhone').value;
+    checkoutData.address = document.getElementById('shipAddress').value;
+    renderCheckoutStep(2);
+  };
+
+  window.finalizeOrder = function() {
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    let msg = `🙏 *New Order - Bhakti Darshan* %0a%0a`;
+    msg += `*Customer:* ${checkoutData.name}%0a`;
+    msg += `*Phone:* ${checkoutData.phone}%0a`;
+    msg += `*Address:* ${checkoutData.address}%0a%0a`;
+    msg += `*Items:*%0a`;
+    cart.forEach(i => {
+      msg += `- ${i.name} (Qty: ${i.qty}) - ₹${i.price * i.qty}%0a`;
+    });
+    msg += `%0a*Total Amount:* ₹${subtotal}%0a`;
+    msg += `*Payment Method:* UPI (Paid / Confirming)`;
+
+    const url = `https://wa.me/918580594748?text=${msg}`;
+    window.open(url, '_blank');
+    cart = [];
+    saveCart();
+    closeCheckoutModal();
+    showToast('Order sent to WhatsApp successfully!');
+  };
+
+  // Background Starfield / Galaxy Canvas Animation (Optimized & Throttled for Mobile)
+  const canvas = document.getElementById('galaxy-canvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let width, height, stars = [];
+    const isMobile = window.innerWidth <= 768;
+    const numStars = isMobile ? 45 : 140; // Reduced particle count on mobile for absolute smoothness
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    for (let i = 0; i < numStars; i++) {
+      stars.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 1.5 + 0.5,
+        alpha: Math.random(),
+        speed: Math.random() * 0.005 + 0.002
+      });
+    }
+
+    function animateGalaxy() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = '#ffffff';
+      stars.forEach(s => {
+        s.alpha += s.speed;
+        if (s.alpha > 1 || s.alpha < 0.2) s.speed = -s.speed;
+        ctx.globalAlpha = Math.abs(s.alpha);
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      requestAnimationFrame(animateGalaxy);
+    }
+    animateGalaxy();
+  }
+
+  // Initial render
+  renderProducts();
+  updateCartUI();
+</script>
+</body>
+</html>
