@@ -998,8 +998,8 @@ if(typeof THREE === 'undefined'){
 
   // Performance-tuned WebGL: keep the galaxy active everywhere, but avoid expensive
   // multisampling and excessive device-pixel rendering on phones.
-  const renderer = new THREE.WebGLRenderer({canvas, alpha:false, antialias:!mobileQuality, powerPreference:'high-performance'});
-  const pixelRatio = mobileQuality ? Math.min(devicePixelRatio || 1, 0.78) : Math.min(devicePixelRatio || 1, 1.2);
+  const renderer = new THREE.WebGLRenderer({canvas, alpha:false, antialias:false, powerPreference:'high-performance', preserveDrawingBuffer:false});
+  const pixelRatio = mobileQuality ? Math.min(devicePixelRatio || 1, 0.55) : Math.min(devicePixelRatio || 1, 0.85);
   renderer.setPixelRatio(pixelRatio);
   renderer.setSize(innerWidth, innerHeight);
   if('outputColorSpace' in renderer && THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -1014,7 +1014,7 @@ if(typeof THREE === 'undefined'){
     if(texCache[name]) return texCache[name];
     const t=loader.load(TEX+name);
     if(color && 'colorSpace' in t && THREE.SRGBColorSpace) t.colorSpace=THREE.SRGBColorSpace;
-    t.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(), mobileQuality ? 2 : 8);
+    t.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(), mobileQuality ? 1 : 4);
     texCache[name]=t;
     return t;
   }
@@ -1047,13 +1047,13 @@ if(typeof THREE === 'undefined'){
     const m=new THREE.PointsMaterial({size,vertexColors:true,transparent:true,opacity,depthWrite:false,sizeAttenuation:true,blending:THREE.AdditiveBlending});
     const p=new THREE.Points(g,m); scene.add(p); return p;
   }
-  const starsFar=starLayer(mobileQuality ? 1600 : 9000,55,180,mobileQuality ? .04 : .035,mobileQuality ? .72 : .78);
-  const starsMid=starLayer(mobileQuality ? 500 : 3000,25,90,mobileQuality ? .06 : .055,mobileQuality ? .68 : .72);
-  const starsNear=starLayer(mobileQuality ? 100 : 550,13,42,mobileQuality ? .10 : .09,mobileQuality ? .80 : .86);
+  const starsFar=starLayer(mobileQuality ? 900 : 4500,55,180,mobileQuality ? .045 : .038,mobileQuality ? .74 : .78);
+  const starsMid=starLayer(mobileQuality ? 260 : 1400,25,90,mobileQuality ? .065 : .058,mobileQuality ? .70 : .72);
+  const starsNear=starLayer(mobileQuality ? 55 : 260,13,42,mobileQuality ? .105 : .095,mobileQuality ? .82 : .86);
 
   /* Bright star points with soft halos. */
   const starSprites=new THREE.Group();
-  for(let i=0;i<(mobileQuality ? 24 : 60);i++){
+  for(let i=0;i<(mobileQuality ? 10 : 32);i++){
     const a=Math.random()*Math.PI*2, r=28+Math.random()*125, y=(Math.random()-.5)*90;
     const s=new THREE.Sprite(new THREE.SpriteMaterial({map:whiteGlow,color:0xffffff,transparent:true,opacity:.32+Math.random()*.42,depthWrite:false,blending:THREE.AdditiveBlending}));
     s.position.set(Math.cos(a)*r,y,Math.sin(a)*r); const z=.45+Math.random()*.8; s.scale.set(z,z,z); starSprites.add(s);
@@ -1062,8 +1062,8 @@ if(typeof THREE === 'undefined'){
 
   /* Milky Way: layered point clouds plus soft nebula glows. */
   const mw=new THREE.Group();
-  for(let layer=0;layer<3;layer++){
-    const count=mobileQuality ? 400 : 2400, pos=new Float32Array(count*3), col=new Float32Array(count*3);
+  for(let layer=0;layer<2;layer++){
+    const count=mobileQuality ? 260 : 1200, pos=new Float32Array(count*3), col=new Float32Array(count*3);
     for(let i=0;i<count;i++){
       const a=Math.random()*Math.PI*2, r=32+Math.random()*125;
       const spread=(Math.random()-.5)*(1.1+r*.035)*(layer+1)*.55;
@@ -1085,7 +1085,7 @@ if(typeof THREE === 'undefined'){
   system.rotation.x=-.28; system.rotation.z=.045; system.position.set(.8,.05,-1.0); scene.add(system);
 
   /* Sun: high resolution sphere + corona layers + point light. */
-  const sun=new THREE.Mesh(new THREE.SphereGeometry(1.22,mobileQuality ? 32 : 96,mobileQuality ? 32 : 96),new THREE.MeshBasicMaterial({map:tex('sun.jpg')}));
+  const sun=new THREE.Mesh(new THREE.SphereGeometry(1.22,mobileQuality ? 20 : 40,mobileQuality ? 20 : 40),new THREE.MeshBasicMaterial({map:tex('sun.jpg')}));
   system.add(sun);
   const corona=new THREE.Group();
   [1.55,1.92,2.45,3.15].forEach((r,i)=>{
@@ -1098,7 +1098,7 @@ if(typeof THREE === 'undefined'){
   scene.add(new THREE.AmbientLight(0x11182b,.18));
 
   function orbitLine(radius){
-    const pts=[]; for(let i=0;i<=(mobileQuality ? 96 : 256);i++){const a=i/(mobileQuality ? 96 : 256)*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(a)*radius,0,Math.sin(a)*radius));}
+    const pts=[]; for(let i=0;i<=(mobileQuality ? 48 : 96);i++){const a=i/(mobileQuality ? 48 : 96)*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(a)*radius,0,Math.sin(a)*radius));}
     const g=new THREE.BufferGeometry().setFromPoints(pts);
     const line=new THREE.LineLoop(g,new THREE.LineBasicMaterial({color:0xa7afc2,transparent:true,opacity:.19,depthWrite:false}));
     return line;
@@ -1131,7 +1131,7 @@ if(typeof THREE === 'undefined'){
         roughness:.88
       });
     } else material=new THREE.MeshStandardMaterial({map:tex(d.map),roughness:.82,metalness:0});
-    const mesh=new THREE.Mesh(new THREE.SphereGeometry(d.r,mobileQuality ? 16 : 48,mobileQuality ? 10 : 32),material);
+    const mesh=new THREE.Mesh(new THREE.SphereGeometry(d.r,mobileQuality ? 10 : 24,mobileQuality ? 8 : 16),material);
     const phase=idx*.82+.55; mesh.position.set(Math.cos(phase)*d.orbit,0,Math.sin(phase)*d.orbit); system.add(mesh);
 
     const p={mesh,orbit:d.orbit,speed:d.speed,phase,earth:!!d.earth};
@@ -1142,14 +1142,14 @@ if(typeof THREE === 'undefined'){
       const moonPivot=new THREE.Group(); mesh.add(moonPivot); const moon=new THREE.Mesh(new THREE.SphereGeometry(.105,mobileQuality ? 14 : 32,mobileQuality ? 10 : 20),new THREE.MeshStandardMaterial({map:tex('moon_1024.jpg'),roughness:.96})); moon.position.set(.68,.04,0); moonPivot.add(moon); p.moonPivot=moonPivot; earthRef.mesh=mesh; earthRef.material=material;
     }
     if(d.ring){
-      const ring=new THREE.Mesh(new THREE.RingGeometry(d.r*1.03,d.r*2.12,mobileQuality ? 48 : 128),new THREE.MeshBasicMaterial({map:tex('saturn_ring.png',false),transparent:true,side:THREE.DoubleSide,opacity:.92,depthWrite:false}));
+      const ring=new THREE.Mesh(new THREE.RingGeometry(d.r*1.03,d.r*2.12,mobileQuality ? 24 : 64),new THREE.MeshBasicMaterial({map:tex('saturn_ring.png',false),transparent:true,side:THREE.DoubleSide,opacity:.92,depthWrite:false}));
       ring.rotation.x=Math.PI/2.18; mesh.add(ring); p.ring=ring;
     }
     planets.push(p);
   });
 
   /* More natural asteroid belt: points plus a few illuminated chunks. */
-  const asteroidCount=mobileQuality ? 80 : 550, ap=new Float32Array(asteroidCount*3), ac=new Float32Array(asteroidCount*3);
+  const asteroidCount=mobileQuality ? 35 : 220, ap=new Float32Array(asteroidCount*3), ac=new Float32Array(asteroidCount*3);
   for(let i=0;i<asteroidCount;i++){
     const a=Math.random()*Math.PI*2, r=5.52+Math.random()*.82, j=i*3;
     ap[j]=Math.cos(a)*r; ap[j+1]=(Math.random()-.5)*.38; ap[j+2]=Math.sin(a)*r;
@@ -1166,7 +1166,7 @@ if(typeof THREE === 'undefined'){
   let lastFrame=0;
   function animate(now=performance.now()){
     requestAnimationFrame(animate);
-    const targetGap=mobileQuality ? 24 : 16;
+    const targetGap=mobileQuality ? 33 : 22;
     if(now-lastFrame<targetGap) return;
     lastFrame=now;
     const t=clock.getElapsedTime();
